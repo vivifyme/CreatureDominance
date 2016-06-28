@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<title>Vivi</title>
+
+
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale = 0.5, maximum-scale = 0.5">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<meta name="description" content="Fun Play">
+	<meta name="author" content="Vivifymetm">
+	<link rel="apple-touch-startup-image"href="/funplay/fun_coins_icon.png">
+
+	<link rel="stylesheet" href="style.css" type="text/css">
+
+	<script type="text/javascript">
+		var __filename;
+		var __serverAddress = "localhost";
+
+
+        function save() {
+			localStorage.setItem("T", $("#canvas").html() );
+		}
+
+		function load() {
+			if (localStorage.getItem( "T") != null)
+				$("#canvas").html(localStorage.getItem( "T"));
+		}
+
+        function onCanvasClick() {
+            console.log();
+        }
+
+	</script>
+
+	<script type="text/javascript" src="jquery.min.js"></script>
+	<script type="text/javascript" src="script.js"></script>
+
+	</head>
+
+    <body>
+
+        <div id="canvas" class="noselect" onclick="onCanvasClick( event )" >
+            <!--
+            <div id="interaction" class="pannel">
+                <div id="title">- vs -</div>
+                <div id="a"></div>
+                <div id="b"></div>
+            </div>
+            -->
+            <div id="creatureList" class="pannel">
+                <div id="cr0"></div>
+            </div>
+
+            <div id="log" class="pannel"></div>
+        </div>
+
+
+    </body>
+
+<script>
+		$(document).ready(function ( event ) {
+
+            console.log("lets go!");
+
+            start();
+		});
+</script>
+
+</html>
