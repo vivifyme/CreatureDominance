@@ -3,8 +3,6 @@ var CREATUREIDcount = 0;
 var creatureList = {};
 var optionList = {};
 
-function nCreature(id) {return new Creature(id);}
-
 function Creature( id ) {
     var interface = {
         getData : function () { return data; },
@@ -15,7 +13,7 @@ function Creature( id ) {
         updateDomicoins : function( v) { console.log(data.domicoins);data.domicoins+=v; console.log(data.domicoins);}
     };
 
-    data = getData(id);
+    var data = getData(id);
 
     function getData(id) {
         if ( (id == undefined) || (creatureList[id] == undefined))
@@ -56,6 +54,9 @@ function Interaction( cA, cB ) {
         update : update,
     };
 
+	var creatureA = new Creature(cA);
+	var creatureB = new Creature(cB);
+
     var aState = "passive";
     var bState = "passive";
 
@@ -70,7 +71,7 @@ function Interaction( cA, cB ) {
                 bState = bOptions[coinFlip()];
                 if (bState == "aggressive") {
                     log(cB+" growls and bares teath.");
-                    nCreature(cB).useEnergy(2);
+                    creatureB.useEnergy(2);
                 }
                 else {
                     log(cB+" cowers and presents belly.");
@@ -81,7 +82,7 @@ function Interaction( cA, cB ) {
                 aState = aOptions[coinFlip()];
                 if (aState == "aggressive") {
                     log(cA+" puffs up and growls back.");
-                    nCreature(cA).useEnergy(2);
+                    creatureA.useEnergy(2);
                 }
                 else {
                     log(cA+" rolls over and presents belly.");
@@ -92,7 +93,7 @@ function Interaction( cA, cB ) {
                 aState = aOptions[coinFlip()];
                 if (aState == "aggressive") {
                     log(cA+"  growls and bares teath.");
-                    nCreature(cA).useEnergy(2);
+                    creatureA.useEnergy(2);
                 }
                 else {
                     log(cA+" softens stance and drops down too.");
@@ -114,8 +115,8 @@ function Interaction( cA, cB ) {
                     log(cB+" backs down, and loses dominance.");
                     log(cA+" has another chance to make a move.");
                     // A has another change
-                    nCreature(cA).updateDomicoins(-1);
-                    nCreature(cB).updateDomicoins(1);
+                    creatureA.updateDomicoins(-1);
+                    creatureB.updateDomicoins(1);
                 }
                 break;
             case "submissive aggressive" :
@@ -128,8 +129,8 @@ function Interaction( cA, cB ) {
                 }
                 else {
                     log(cB+" backs down and starts to groom "+cA);
-                    nCreature(cB).useEnergy(1);
-                    nCreature(cA).groom(10);
+                    creatureB.useEnergy(1);
+                    creatureA.groom(10);
                 }
                 aState = "leave";
                 bState = "leave";
@@ -144,16 +145,16 @@ function Interaction( cA, cB ) {
                 }
                 else {
                     log(cA+" backs down and starts to groom "+cB);
-                    nCreature(cA).useEnergy(1);
-                    nCreature(cB).groom(10);
+                    creatureA.useEnergy(1);
+                    creatureB.groom(10);
                 }
                 aState = "leave";
                 bState = "leave";
                 break;
             case "submissive submissive" :
                 log(cA+" grooms "+cB);
-                nCreature(cA).useEnergy(1);
-                nCreature(cB).groom(10);
+                creatureA.useEnergy(1);
+                creatureB.groom(10);
                 aState = "leave";
                 bState = "leave";
                 break;
@@ -177,8 +178,8 @@ function Interaction( cA, cB ) {
 }
 
 function fight( cA, cB, aPenalty, bPenalty) {
-    var a = nCreature(cA);
-    var b = nCreature(cB);
+    var a = new Creature(cA);
+    var b = new Creature(cB);
 console.log(a.getData().id+" "+cA)
 console.log(b.getData().id+" "+cB)
     a.useEnergy(10);
