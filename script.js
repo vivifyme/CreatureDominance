@@ -3,23 +3,32 @@ var CREATUREIDcount = 0;
 var creatureList = {};
 var optionList = {};
 
-function Creature( id ) {
+function Creature( d ) {
     var interface = {
         getData : function () { return data; },
         useEnergy : function( v ) { data.energy-=v;},
         gainEnergy : function( v ) { data.energy+=v;},
         scuff : function( v ) { data.grooming-=v;},
         groom : function( v ) { Math.min(100, data.grooming+=v );},
-        updateDomicoins : function( v) { console.log(data.domicoins);data.domicoins+=v; console.log(data.domicoins);}
+        updateDomicoins : function( v) { data.domicoins+=v; }
     };
 
-    var data = getData(id);
+    var data = getData(d);
 
-    function getData(id) {
-        if ( (id == undefined) || (creatureList[id] == undefined))
+    function getData(d) {
+        if (typeof(d) == "object") {
+            var newdata = newData()
+
+            for (var k in d) {
+                newdata[k] = d[k];
+            }
+
+            return newdata;
+        }
+        else if ( (d == undefined) || (creatureList[d] == undefined))
             return newData()
         else
-            return creatureList[id];
+            return creatureList[d];
     }
 
     function newData() {
@@ -28,7 +37,7 @@ function Creature( id ) {
             desiredDominance : randExp(50, 100, 2,80),  // level of dominance that this creates desires
             energy : randExp(50, 100, 2,80),            // energy reserves used to perform activities, replenished by eating
             grooming : randExp(50, 100, 1,80),          // personal hygene levels. from looking good down to clean but ordernery, to disheveled, to scraggly, matted, parasite enfested, deased.
-            size : randExp(5, 10, 3,5),                 // is a proxy for strength
+            size : randExp(20, 30, 3,20),                // is a proxy for strength
             skill : randExp(0, 3, 1,1),                // the ability yo use the maximum amount of its strength/size in fight
             id : CREATUREIDcount++
         }
@@ -64,6 +73,8 @@ function Interaction( cA, cB ) {
 
 
     function update() {
+
+        var ret = false;
 
         switch (aState+" "+bState) {
             case "passive passive" :
@@ -171,7 +182,10 @@ function Interaction( cA, cB ) {
             default :
                 log("The End.");
                 break;
+                ret = true;
         }
+
+        return ret;
     }
 
     return interface;
@@ -180,34 +194,40 @@ function Interaction( cA, cB ) {
 function fight( cA, cB, aPenalty, bPenalty) {
     var a = new Creature(cA);
     var b = new Creature(cB);
-console.log(a.getData().id+" "+cA)
-console.log(b.getData().id+" "+cB)
+
     a.useEnergy(10);
     b.useEnergy(10);
 
     var aData = a.getData();
     var bData = b.getData();
 
-    var aRoll = randExp(0,aData.size,aData.skill-aPenalty,aData.size)
-    var bRoll = randExp(0,bData.size,aData.skill-aPenalty,bData.size)
+    var aRoll = randExp(0,aData.size,aData.skill-aPenalty,aData.size+1)
+    var bRoll = randExp(0,bData.size,bData.skill-bPenalty,bData.size+1)
+
+    var ret = 0;
 
     if (aRoll > bRoll) {
-        log(cA+" wins ");
+        //log(cA+" wins ");
         a.updateDomicoins(1);
         b.updateDomicoins(-1);
         b.scuff((aRoll-bRoll)*5);
         a.scuff(5);
+        ret = 1;
     } else if (bRoll > aRoll) {
-        log(cB+" wins ");
+       // log(cB+" wins ");
         b.updateDomicoins(1);
         a.updateDomicoins(-1);
         a.scuff((bRoll-aRoll)*5);
         b.scuff(5);
+        ret = 2;
     } else {
-        log("its a stailmate."+cB);
+       // log("its a stailmate."+cB);
         a.scuff(10);
         b.scuff(10);
+        ret = 0;
     }
+
+    return ret;
 }
 
 function Opinion( cA, cB  ) {
@@ -347,4 +367,27 @@ function testDist( n, f, t, s, center) {
 
         console.log(" "+(i)+"\t\t\t\t"+bar+" ("+dist[i]+")");
     }
+}
+
+function testFight( aSize, aSkill, bSize, bSkill, n ) {
+    var creatureA = new Creature({size:aSize,skill:aSkill});
+    var creatureB = new Creature({size:bSize,skill:bSkill});
+
+    var scores = {0:0, 1:0,2:0};
+
+    for (var i=0;i<n;i++) {
+        scores[fight(creatureA.getData().id, creatureB.getData().id, 0, 0 )]++;
+    }
+
+    var t = scores[0]+scores[1]+scores[2];
+
+    var bars = {0:"",1:"",2:""};
+    for (var i=0;i<3;i++)
+        for (var j=0;j<Math.round(scores[i]/t*100/2);j++)
+            bars[i] = "#"+bars[i];
+
+    console.log("A: "+bars[1]+" "+Math.round(scores[1]/t*100));
+    console.log("B: "+bars[2]+" "+Math.round(scores[2]/t*100));
+    console.log("=: "+bars[0]+" "+Math.round(scores[0]/t*100));
+
 }
