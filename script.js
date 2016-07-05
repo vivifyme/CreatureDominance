@@ -201,8 +201,8 @@ function fight( cA, cB, aPenalty, bPenalty) {
     var aData = a.getData();
     var bData = b.getData();
 
-    var aRoll = randExp(0,aData.size,aData.skill-aPenalty,aData.size+1)
-    var bRoll = randExp(0,bData.size,bData.skill-bPenalty,bData.size+1)
+    var aRoll = randExp(0,aData.size,aData.skill-aPenalty,aData.size+aData.skill)
+    var bRoll = randExp(0,bData.size,bData.skill-bPenalty,bData.size+bData.skill)
 
     var ret = 0;
 
@@ -291,20 +291,30 @@ function log( msg ) {
     $("#log").append("<div>"+msg+"</div>");
 }
 
+
+var USEROT = true;
+function random() {
+	if (USEROT)
+		return ROT.RNG.getUniform();
+	else
+		return Math.random();
+}
+
+
 function randExp(from, to, exp, center) {
     if (center== undefined)
         center =0;
 
-    x = (Math.random()*(to-from)+from-center);
+    x = (random()*(to+1-from)+from-center);
 
     for (var j=0;j<exp;j++)
-        x*=Math.random();
+        x*=random();
 
-    return Math.round(x+center);
+    return Math.floor(x+center);
 }
 
 function coinFlip() {
-    return Math.round(Math.random());
+    return Math.round(random());
 }
 
 var cv;
@@ -368,6 +378,7 @@ function testDist( n, f, t, s, center) {
         console.log(" "+(i)+"\t\t\t\t"+bar+" ("+dist[i]+")");
     }
 }
+
 
 function testFight( aSize, aSkill, bSize, bSkill, n ) {
     var creatureA = new Creature({size:aSize,skill:aSkill});
