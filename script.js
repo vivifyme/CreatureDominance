@@ -399,8 +399,15 @@ function testFight( aSize, aSkill, bSize, bSkill, n ) {
         for (var j=0;j<Math.round(scores[i]/t*100/2);j++)
             bars[i] = "#"+bars[i];
 
-    console.log("A: "+bars[1]+" "+Math.round(scores[1]/t*100));
-    console.log("B: "+bars[2]+" "+Math.round(scores[2]/t*100));
-    console.log("=: "+bars[0]+" "+Math.round(scores[0]/t*100));
+    var aSpace = Math.floor(aSize/(aSkill+1));
+    var bSpace = Math.floor(bSize/(bSkill+1));
+    var mSpace = Math.max(aSpace,bSpace);
+    var draw = Math.floor(1/mSpace*100);
+    var aChance = Math.floor( aSpace/ (aSpace+bSpace) *100) - draw;
+    var bChance = Math.floor( bSpace/ (aSpace+bSpace) *100) - draw;
+
+    console.log("A: "+bars[1]+" "+Math.round(scores[1]/t*100)+" e:"+aChance);
+    console.log("B: "+bars[2]+" "+Math.round(scores[2]/t*100)+" e:"+bChance);
+    console.log("=: "+bars[0]+" "+Math.round(scores[0]/t*100)+" e:"+draw);
 
 }
