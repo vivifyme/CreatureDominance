@@ -1,10 +1,14 @@
+/*jslint white: true*/
 var CREATUREIDcount = 0;
 
 var creatureList = {};
 var optionList = {};
 
 function Creature( d ) {
-    var interface = {
+    "use strict";
+    var data = getData(d);
+
+    var interf = {
         getData : function () { return data; },
         useEnergy : function( v ) { data.energy-=v;},
         gainEnergy : function( v ) { data.energy+=v;},
@@ -12,8 +16,6 @@ function Creature( d ) {
         groom : function( v ) { Math.min(100, data.grooming+=v );},
         updateDomicoins : function( v) { data.domicoins+=v; }
     };
-
-    var data = getData(d);
 
     function getData(d) {
         if (typeof(d) == "object") {
@@ -47,7 +49,7 @@ function Creature( d ) {
         return newdata;
     }
 
-    return interface;
+    return interf;
 }
 /*
 function viewLists() {
@@ -59,7 +61,7 @@ function viewLists() {
 
 
 function Interaction( cA, cB ) {
-    var interface = {
+    var interf = {
         update : update,
     };
 
@@ -188,7 +190,7 @@ function Interaction( cA, cB ) {
         return ret;
     }
 
-    return interface;
+    return interf;
 }
 
 function fight( cA, cB, aPenalty, bPenalty) {
@@ -232,7 +234,7 @@ function fight( cA, cB, aPenalty, bPenalty) {
 
 function Opinion( cA, cB  ) {
 
-    var interface = {
+    var interf = {
         getData : function () { return data; }
     };
 
@@ -260,11 +262,11 @@ function Opinion( cA, cB  ) {
         return newdata;
     }
 
-    return interface;
+    return interf;
 }
 
 function CreatureView() {
-    var interface = {
+    var interf = {
         update : update
     }
 
@@ -284,7 +286,7 @@ function CreatureView() {
         }
     }
 
-    return interface;
+    return interf;
 }
 
 function log( msg ) {
