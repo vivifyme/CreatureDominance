@@ -306,14 +306,27 @@ function CreatureView() {
 
         for (var k in creatureList) {
             //console.log(""+k+" > "+JSON.stringify( creatureList[k]) );
-            elem = $("#creatureList > #cr"+k);
+            elem = $("#canvas > #cr"+k);
 
             if (elem.length == 0) {
-                $("#creatureList").append("<div id='cr"+k+"'></div>");
+                $("#canvas").append("<div id='cr"+k+"' class='pannel'></div>");
                 elem = $("#creatureList > #cr"+k);
             }
 
-            elem.html(""+k+" > "+JSON.stringify( creatureList[k]));
+            var content = "";
+
+            for (var j in creatureList[k])
+                if (["id"].indexOf(j) < 0)
+                    if (["desiredDominance","domicoins"].indexOf(j) < 0)
+                        if (j == "size")
+                            //content += "<div>"+(j+":").rpad(".",17)+("## "+creatureList[k][j]).lpad("#",(""+(creatureList[k][j]-20+5)).rpad(".",10))+"</div>";
+                            content += "<div>"+(j+":").rpad(".",17)+(("## "+creatureList[k][j]).lpad("#",creatureList[k][j]-20+5).rpad(".",10))+"</div>";
+                        else
+                            content += "<div>"+(j+":").rpad(".",17)+("#".lpad("#",creatureList[k][j]/10).rpad(".",10))+"</div>";
+                    else
+                        content += "<div>"+(j+":").rpad(".",17)+((creatureList[k][j]+"").lpad("0",3))+"</div>";
+
+            elem.html(""+k+" > "+content);//JSON.stringify( creatureList[k]));
         }
     }
 
