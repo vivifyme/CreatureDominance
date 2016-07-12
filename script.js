@@ -193,6 +193,28 @@ function Interaction( cA, cB ) {
     return interf;
 }
 
+function chooseWaited() {
+
+}
+
+function brawl( aSize, aSkill, bSize, bSkill ) {
+
+    if (aSkill < 0) aSkill=0;
+    if (bSkill < 0) bSkill=0;
+
+    aSkill*=4;
+    bSkill*=4;
+
+    var aChance = aSize+aSize*aSkill + (aSize>bSize?aSize/bSize*10:0)*aSkill;
+    var bChance = bSize+bSize*bSkill + (bSize>aSize?bSize/aSize*10:0)*bSkill;
+    var total = aChance + bChance;
+    var dChance =  Math.floor(total*5/100*(aSkill+bSkill-Math.abs(aSkill-bSkill)));
+    total += dChance;
+
+    return ROT.RNG.getWeightedValue({1:aChance,2:bChance,0:dChance});
+
+}
+
 function fight( cA, cB, aPenalty, bPenalty) {
     var a = new Creature(cA);
     var b = new Creature(cB);
@@ -202,31 +224,34 @@ function fight( cA, cB, aPenalty, bPenalty) {
 
     var aData = a.getData();
     var bData = b.getData();
-
+    /*
     var aRoll = randExp(0,aData.size,aData.skill-aPenalty,aData.size+aData.skill)
     var bRoll = randExp(0,bData.size,bData.skill-bPenalty,bData.size+bData.skill)
+    /**/
+    var ret = brawl(aData.size,aData.skill-aPenalty,bData.size,bData.skill-bPenalty);
 
-    var ret = 0;
+    switch (ret) {
+        case "1":
+            log(cA+" wins ");
+            a.updateDomicoins(1);
+            b.updateDomicoins(-1);
+            b.scuff(15);
+            a.scuff(5);
+            break;
 
-    if (aRoll > bRoll) {
-        //log(cA+" wins ");
-        a.updateDomicoins(1);
-        b.updateDomicoins(-1);
-        b.scuff((aRoll-bRoll)*5);
-        a.scuff(5);
-        ret = 1;
-    } else if (bRoll > aRoll) {
-       // log(cB+" wins ");
-        b.updateDomicoins(1);
-        a.updateDomicoins(-1);
-        a.scuff((bRoll-aRoll)*5);
-        b.scuff(5);
-        ret = 2;
-    } else {
-       // log("its a stailmate."+cB);
-        a.scuff(10);
-        b.scuff(10);
-        ret = 0;
+        case "2":
+            log(cB+" wins ");
+            b.updateDomicoins(1);
+            a.updateDomicoins(-1);
+            a.scuff(15);
+            b.scuff(5);
+            break;
+        case "0":
+            log("its a stailmate."+cB);
+            a.scuff(10);
+            b.scuff(10);
+            ret = 0;
+            break;
     }
 
     return ret;
@@ -399,15 +424,58 @@ function testFight( aSize, aSkill, bSize, bSkill, n ) {
         for (var j=0;j<Math.round(scores[i]/t*100/2);j++)
             bars[i] = "#"+bars[i];
 
-    var aSpace = Math.floor(aSize/(aSkill+1));
-    var bSpace = Math.floor(bSize/(bSkill+1));
-    var mSpace = Math.max(aSpace,bSpace);
-    var draw = Math.floor(1/mSpace*100);
-    var aChance = Math.floor( aSpace/ (aSpace+bSpace) *100) - draw;
-    var bChance = Math.floor( bSpace/ (aSpace+bSpace) *100) - draw;
+    var aChance = aSize+aSize*aSkill + (aSize>bSize?aSize/bSize*10:0)*aSkill;
+    var bChance = bSize+bSize*bSkill + (bSize>aSize?bSize/aSize*10:0)*bSkill;
+    var total = aChance + bChance;
+    var dChance =  Math.floor(total*5/100*(aSkill+bSkill-Math.abs(aSkill-bSkill)));
+    total += dChance;
 
-    console.log("A: "+bars[1]+" "+Math.round(scores[1]/t*100)+" e:"+aChance);
-    console.log("B: "+bars[2]+" "+Math.round(scores[2]/t*100)+" e:"+bChance);
-    console.log("=: "+bars[0]+" "+Math.round(scores[0]/t*100)+" e:"+draw);
+    var aChance = Math.floor(aChance/total*100);
+    var bChance = Math.floor(bChance/total*100);
+    var dChance = Math.floor(dChance/total*100);
+
+
+    console.log("A: "+bars[1].rpad(" ",40)+" "+Math.round(scores[1]/t*100)+" e:"+aChance+"# ".lpad("#",Math.floor(aChance/2)));
+    console.log("B: "+bars[2].rpad(" ",40)+" "+Math.round(scores[2]/t*100)+" e:"+bChance+"# ".lpad("#",Math.floor(bChance/2)));
+    console.log("=: "+bars[0].rpad(" ",40)+" "+Math.round(scores[0]/t*100)+" e:"+dChance+"# ".lpad("#",Math.floor(dChance/2)));
 
 }
+
+function fightOdds( aSize, aSkill, bSize, bSkill, n ) {
+
+    aSkill*=4;
+    bSkill*=4;
+
+    var aChance = aSize+aSize*aSkill + (aSize>bSize?aSize/bSize*10:0)*aSkill;
+    var bChance = bSize+bSize*bSkill + (bSize>aSize?bSize/aSize*10:0)*bSkill;
+    var total = aChance + bChance;
+    var dChance =  Math.floor(total*5/100*(aSkill+bSkill-Math.abs(aSkill-bSkill)));
+    total += dChance;
+
+    var aChance = Math.floor(aChance/total*100);
+    var bChance = Math.floor(bChance/total*100);
+    var dChance = Math.floor(dChance/total*100);
+
+    console.log("A> "+"# ".lpad("#",Math.floor(aChance/2))+aChance);
+    console.log("B> "+"# ".lpad("#",Math.floor(bChance/2))+bChance);
+    console.log("-> "+"# ".lpad("#",Math.floor(dChance/2))+dChance);
+
+    var scores = {"A":0,"B":0,"d":0};
+    for (var i=0;i<n;i++) {
+        scores[ROT.RNG.getWeightedValue({"A":aChance,"B":bChance,"d":dChance})]++;
+    }
+
+    scores["A"] = Math.floor(scores["A"]/n*100);
+    scores["B"] = Math.floor(scores["B"]/n*100);
+    scores["d"] = Math.floor(scores["d"]/n*100);
+
+    console.log("A> "+"# ".lpad("#",Math.floor(scores["A"]/2))+scores["A"]);
+    console.log("B> "+"# ".lpad("#",Math.floor(scores["B"]/2))+scores["B"]);
+    console.log("-> "+"# ".lpad("#",Math.floor(scores["d"]/2))+scores["d"]);
+
+}
+/*
+if B is larger than A
+then to overpwer B a
+
+/**/
