@@ -197,8 +197,7 @@ function chooseWaited() {
 
 }
 
-function brawl( aSize, aSkill, bSize, bSkill ) {
-
+function getBrawlOdds( aSize, aSkill, bSize, bSkill ) {
     if (aSkill < 0) aSkill=0;
     if (bSkill < 0) bSkill=0;
 
@@ -208,11 +207,18 @@ function brawl( aSize, aSkill, bSize, bSkill ) {
     var aChance = aSize+aSize*aSkill + (aSize>bSize?aSize/bSize*10:0)*aSkill;
     var bChance = bSize+bSize*bSkill + (bSize>aSize?bSize/aSize*10:0)*bSkill;
     var total = aChance + bChance;
-    var dChance =  Math.floor(total*5/100*(aSkill+bSkill-Math.abs(aSkill-bSkill)));
+    var dChance =  Math.floor(total*5/100*(Math.max(aSkill,bSkill)-Math.abs(aSkill-bSkill)));
     total += dChance;
 
-    return ROT.RNG.getWeightedValue({1:aChance,2:bChance,0:dChance});
+    return {
+        1:Math.floor(aChance/total*100),
+        2:Math.floor(bChance/total*100),
+        0:Math.floor(dChance/total*100)
+    };
+}
 
+function brawl( aSize, aSkill, bSize, bSkill ) {
+    return ROT.RNG.getWeightedValue( getBrawlOdds(aSize, aSkill, bSize, bSkill) );
 }
 
 function fight( cA, cB, aPenalty, bPenalty) {
@@ -417,65 +423,15 @@ function testFight( aSize, aSkill, bSize, bSkill, n ) {
         scores[fight(creatureA.getData().id, creatureB.getData().id, 0, 0 )]++;
     }
 
-    var t = scores[0]+scores[1]+scores[2];
+    var odds = getBrawlOdds( aSize, aSkill, bSize, bSkill );
 
-    var bars = {0:"",1:"",2:""};
-    for (var i=0;i<3;i++)
-        for (var j=0;j<Math.round(scores[i]/t*100/2);j++)
-            bars[i] = "#"+bars[i];
+    scores[0] = Math.floor(scores[0]/n*100);
+    scores[1] = Math.floor(scores[1]/n*100);
+    scores[2] = Math.floor(scores[2]/n*100);
 
-    var aChance = aSize+aSize*aSkill + (aSize>bSize?aSize/bSize*10:0)*aSkill;
-    var bChance = bSize+bSize*bSkill + (bSize>aSize?bSize/aSize*10:0)*bSkill;
-    var total = aChance + bChance;
-    var dChance =  Math.floor(total*5/100*(aSkill+bSkill-Math.abs(aSkill-bSkill)));
-    total += dChance;
-
-    var aChance = Math.floor(aChance/total*100);
-    var bChance = Math.floor(bChance/total*100);
-    var dChance = Math.floor(dChance/total*100);
-
-
-    console.log("A: "+bars[1].rpad(" ",40)+" "+Math.round(scores[1]/t*100)+" e:"+aChance+"# ".lpad("#",Math.floor(aChance/2)));
-    console.log("B: "+bars[2].rpad(" ",40)+" "+Math.round(scores[2]/t*100)+" e:"+bChance+"# ".lpad("#",Math.floor(bChance/2)));
-    console.log("=: "+bars[0].rpad(" ",40)+" "+Math.round(scores[0]/t*100)+" e:"+dChance+"# ".lpad("#",Math.floor(dChance/2)));
+    console.log("A: "+("# "+scores[1]).lpad("#",5+scores[1]/2).rpad(" ",50)+("# "+odds[1]).lpad("#",5+odds[1]/2).rpad(" ",40) );
+    console.log("B: "+("# "+scores[2]).lpad("#",5+scores[2]/2).rpad(" ",50)+("# "+odds[2]).lpad("#",5+odds[2]/2).rpad(" ",40) );
+    console.log("=: "+("# "+scores[0]).lpad("#",5+scores[0]/2).rpad(" ",50)+("# "+odds[0]).lpad("#",5+odds[0]/2).rpad(" ",40) );
 
 }
 
-function fightOdds( aSize, aSkill, bSize, bSkill, n ) {
-
-    aSkill*=4;
-    bSkill*=4;
-
-    var aChance = aSize+aSize*aSkill + (aSize>bSize?aSize/bSize*10:0)*aSkill;
-    var bChance = bSize+bSize*bSkill + (bSize>aSize?bSize/aSize*10:0)*bSkill;
-    var total = aChance + bChance;
-    var dChance =  Math.floor(total*5/100*(aSkill+bSkill-Math.abs(aSkill-bSkill)));
-    total += dChance;
-
-    var aChance = Math.floor(aChance/total*100);
-    var bChance = Math.floor(bChance/total*100);
-    var dChance = Math.floor(dChance/total*100);
-
-    console.log("A> "+"# ".lpad("#",Math.floor(aChance/2))+aChance);
-    console.log("B> "+"# ".lpad("#",Math.floor(bChance/2))+bChance);
-    console.log("-> "+"# ".lpad("#",Math.floor(dChance/2))+dChance);
-
-    var scores = {"A":0,"B":0,"d":0};
-    for (var i=0;i<n;i++) {
-        scores[ROT.RNG.getWeightedValue({"A":aChance,"B":bChance,"d":dChance})]++;
-    }
-
-    scores["A"] = Math.floor(scores["A"]/n*100);
-    scores["B"] = Math.floor(scores["B"]/n*100);
-    scores["d"] = Math.floor(scores["d"]/n*100);
-
-    console.log("A> "+"# ".lpad("#",Math.floor(scores["A"]/2))+scores["A"]);
-    console.log("B> "+"# ".lpad("#",Math.floor(scores["B"]/2))+scores["B"]);
-    console.log("-> "+"# ".lpad("#",Math.floor(scores["d"]/2))+scores["d"]);
-
-}
-/*
-if B is larger than A
-then to overpwer B a
-
-/**/
