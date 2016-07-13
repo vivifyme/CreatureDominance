@@ -77,3 +77,13 @@
     margin: 5px;
     padding: 2px;
 }
+
+.att {
+    display: inline;
+    margin: 1px;
+}
+
+#creatureList{
+    width: 690px;
+    padding: 0px;
+}
