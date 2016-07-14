@@ -309,7 +309,7 @@ function CreatureView() {
             elem = $("#creatureList > #cr"+k);
 
             if (elem.length == 0) {
-                $("#creatureList").append("<div id='cr"+k+"' class='pannel'></div>");
+                $("#creatureList").append("<div id='cr"+k+"' class='creatureLi'></div>");
                 elem = $("#creatureList > #cr"+k);
             }
 
@@ -320,13 +320,13 @@ function CreatureView() {
                     if (["desiredDominance","domicoins"].indexOf(j) < 0)
                         if (j == "size")
                             //content += "<div>"+(j+":").rpad(".",17)+("## "+creatureList[k][j]).lpad("#",(""+(creatureList[k][j]-20+5)).rpad(".",10))+"</div>";
-                            content += "<div class='att'>"+(j.substr(0,2)+":").rpad(".",2)+((""+creatureList[k][j]+"##").rpad("#",creatureList[k][j]-20+5).lpad(".",10))+"</div>";
+                            content += "<div class='att'> "+(j.substr(0,2)+":").rpad(".",2)+((""+creatureList[k][j]+"##").rpad("#",creatureList[k][j]-20+5).lpad(".",10))+"</div>";
                         else
-                            content += "<div class='att'>"+(j.substr(0,2)+":").rpad(".",2)+("#".lpad("#",creatureList[k][j]/10).lpad(".",10))+"</div>";
+                            content += "<div class='att'> "+(j.substr(0,2)+":").rpad(".",2)+("#".lpad("#",creatureList[k][j]/10).lpad(".",10))+"</div>";
                     else
-                        content += "<div class='att'>"+(j.substr(0,2)+":").rpad(".",2)+((creatureList[k][j]+"").lpad("0",3))+"</div>";
+                        content += "<div class='att' >"+(j.substr(0,2)+":").rpad(".",2)+((creatureList[k][j]+"").lpad("0",3))+"</div>";
 
-            elem.html("<div class='att'>"+(k).lpad("0",3)+" </div>"+content);//JSON.stringify( creatureList[k]));
+            elem.html("<div class='att'> "+(k).lpad("0",3)+" </div>"+content);//JSON.stringify( creatureList[k]));
         }
     }
 
