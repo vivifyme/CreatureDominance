@@ -207,7 +207,7 @@ function getBrawlOdds( aSize, aSkill, bSize, bSkill ) {
     var aChance = aSize+aSize*aSkill + (aSize>bSize?aSize/bSize*10:0)*aSkill;
     var bChance = bSize+bSize*bSkill + (bSize>aSize?bSize/aSize*10:0)*bSkill;
     var total = aChance + bChance;
-    var dChance =  Math.floor(total*5/100*(Math.max(aSkill,bSkill)-Math.abs(aSkill-bSkill)));
+    var dChance =  Math.floor(total*4/100*(Math.max(aSkill,bSkill)-Math.abs(aSkill-bSkill)));
     total += dChance;
 
     return {
@@ -316,12 +316,14 @@ function CreatureView() {
             var content = "";
 
             for (var j in creatureList[k])
-                if (["id"].indexOf(j) < 0)
-                    if (["desiredDominance","domicoins"].indexOf(j) < 0)
-                        if (j == "size")
+                if (["id"].indexOf(j) < 0) // these are not displayed
+                    if (["desiredDominance","domicoins"].indexOf(j) < 0) // these are displayed as pure numbers
+                        if (j == "size") // this is a special case
                             //content += "<div>"+(j+":").rpad(".",17)+("## "+creatureList[k][j]).lpad("#",(""+(creatureList[k][j]-20+5)).rpad(".",10))+"</div>";
                             content += "<div>"+(j+":").rpad(".",17)+(("## "+creatureList[k][j]).lpad("#",creatureList[k][j]-20+5).rpad(".",10))+"</div>";
-                        else
+                        else if (j == "skill")
+                            content += "<div>"+(j+":").rpad(".",17)+("#".lpad("#",creatureList[k][j]).rpad(".",10))+"</div>";
+                        else // these are bars
                             content += "<div>"+(j+":").rpad(".",17)+("#".lpad("#",creatureList[k][j]/10).rpad(".",10))+"</div>";
                     else
                         content += "<div>"+(j+":").rpad(".",17)+((creatureList[k][j]+"").lpad("0",3))+"</div>";
